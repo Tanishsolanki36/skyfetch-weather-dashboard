@@ -4,15 +4,15 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    min-height: 100vh;
     margin: 0;
 }
 
 .container {
     background: white;
-    padding: 30px;
+    padding: 25px;
     border-radius: 15px;
-    width: 350px;
+    width: 380px;
     text-align: center;
     box-shadow: 0 10px 25px rgba(0,0,0,0.2);
 }
@@ -26,11 +26,6 @@ body {
     width: 65%;
     border-radius: 8px;
     border: 1px solid #ccc;
-    outline: none;
-}
-
-#city-input:focus {
-    border-color: #4facfe;
 }
 
 #search-btn {
@@ -40,21 +35,10 @@ body {
     background: #4facfe;
     color: white;
     cursor: pointer;
-    transition: 0.3s;
-}
-
-#search-btn:hover {
-    background: #007bff;
 }
 
 #search-btn:disabled {
     background: gray;
-    cursor: not-allowed;
-}
-
-.error {
-    color: red;
-    font-weight: bold;
 }
 
 .spinner {
@@ -68,7 +52,35 @@ body {
 }
 
 @keyframes spin {
-    100% {
-        transform: rotate(360deg);
-    }
+    100% { transform: rotate(360deg); }
+}
+
+.error {
+    color: red;
+    font-weight: bold;
+}
+
+/* Forecast Section */
+
+.forecast-container {
+    margin-top: 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 10px;
+}
+
+.forecast-card {
+    background: #f5f9ff;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+    transition: 0.3s;
+}
+
+.forecast-card:hover {
+    transform: translateY(-5px);
+}
+
+.forecast-card img {
+    width: 50px;
 }
