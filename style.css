@@ -12,13 +12,13 @@ body {
     background: white;
     padding: 25px;
     border-radius: 15px;
-    width: 380px;
+    width: 400px;
     text-align: center;
     box-shadow: 0 10px 25px rgba(0,0,0,0.2);
 }
 
 .search-section {
-    margin-bottom: 20px;
+    margin-bottom: 15px;
 }
 
 #city-input {
@@ -41,6 +41,35 @@ body {
     background: gray;
 }
 
+.recent-section {
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+.recent-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#clear-btn {
+    background: crimson;
+    color: white;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+#recent-searches button {
+    margin: 4px;
+    padding: 5px 8px;
+    border: none;
+    border-radius: 6px;
+    background: #e3f2fd;
+    cursor: pointer;
+}
+
 .spinner {
     border: 4px solid #f3f3f3;
     border-top: 4px solid #4facfe;
@@ -60,12 +89,12 @@ body {
     font-weight: bold;
 }
 
-/* Forecast Section */
+/* Forecast */
 
 .forecast-container {
-    margin-top: 20px;
+    margin-top: 15px;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
     gap: 10px;
 }
 
@@ -73,14 +102,9 @@ body {
     background: #f5f9ff;
     padding: 10px;
     border-radius: 10px;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
-    transition: 0.3s;
-}
-
-.forecast-card:hover {
-    transform: translateY(-5px);
+    text-align: center;
 }
 
 .forecast-card img {
-    width: 50px;
+    width: 40px;
 }

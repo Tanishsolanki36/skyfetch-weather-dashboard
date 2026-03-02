@@ -4,12 +4,18 @@ function WeatherApp() {
     this.cityInput = document.getElementById("city-input");
     this.searchBtn = document.getElementById("search-btn");
     this.weatherDisplay = document.getElementById("weather-display");
+
+    this.recentContainer = document.getElementById("recent-searches");
+    this.clearBtn = document.getElementById("clear-btn");
+
+    this.recentSearches = [];
 }
 
 /* ================= INIT ================= */
 
 WeatherApp.prototype.init = function() {
-    this.showWelcome();
+    this.loadRecentSearches();
+    this.loadLastCity();
 
     this.searchBtn.addEventListener("click", this.handleSearch.bind(this));
 
@@ -18,23 +24,21 @@ WeatherApp.prototype.init = function() {
             this.handleSearch();
         }
     });
+
+    this.clearBtn.addEventListener("click", this.clearHistory.bind(this));
 };
 
 /* ================= SEARCH ================= */
 
 WeatherApp.prototype.handleSearch = function() {
     const city = this.cityInput.value.trim();
-
-    if (!city) {
-        this.showError("Please enter a city name!");
-        return;
-    }
+    if (!city) return;
 
     this.getWeather(city);
     this.cityInput.value = "";
 };
 
-/* ================= WEATHER ================= */
+/* ================= WEATHER + FORECAST ================= */
 
 WeatherApp.prototype.getWeather = async function(city) {
 
@@ -54,8 +58,11 @@ WeatherApp.prototype.getWeather = async function(city) {
         ]);
 
         this.displayWeather(weatherRes.data);
+
         const processed = this.processForecastData(forecastRes.data.list);
         this.displayForecast(processed);
+
+        this.saveRecentSearch(weatherRes.data.name);
 
     } catch (error) {
         this.showError("City not found or API error.");
@@ -64,10 +71,9 @@ WeatherApp.prototype.getWeather = async function(city) {
     }
 };
 
-/* ================= DISPLAY CURRENT WEATHER ================= */
+/* ================= DISPLAY WEATHER ================= */
 
 WeatherApp.prototype.displayWeather = function(data) {
-
     this.weatherDisplay.innerHTML = `
         <h2>${data.name}</h2>
         <p>🌡 ${data.main.temp}°C</p>
@@ -78,37 +84,84 @@ WeatherApp.prototype.displayWeather = function(data) {
 /* ================= FORECAST ================= */
 
 WeatherApp.prototype.processForecastData = function(list) {
-
     const daily = list.filter(item => item.dt_txt.includes("12:00:00"));
-
     return daily.slice(0, 5);
 };
 
-WeatherApp.prototype.displayForecast = function(forecastData) {
+WeatherApp.prototype.displayForecast = function(data) {
+    let html = `<div class="forecast-container">`;
 
-    let forecastHTML = `<div class="forecast-container">`;
-
-    forecastData.forEach(day => {
-
+    data.forEach(day => {
         const date = new Date(day.dt_txt);
         const dayName = date.toLocaleDateString("en-US", { weekday: "short" });
 
-        forecastHTML += `
+        html += `
             <div class="forecast-card">
                 <h4>${dayName}</h4>
-                <img src="https://openweathermap.org/img/wn/${day.weather[0].icon}@2x.png" />
+                <img src="https://openweathermap.org/img/wn/${day.weather[0].icon}@2x.png">
                 <p>${day.main.temp}°C</p>
-                <p>${day.weather[0].description}</p>
             </div>
         `;
     });
 
-    forecastHTML += `</div>`;
-
-    this.weatherDisplay.innerHTML += forecastHTML;
+    html += `</div>`;
+    this.weatherDisplay.innerHTML += html;
 };
 
-/* ================= UI HELPERS ================= */
+/* ================= LOCAL STORAGE ================= */
+
+WeatherApp.prototype.loadRecentSearches = function() {
+    const stored = localStorage.getItem("recentSearches");
+    this.recentSearches = stored ? JSON.parse(stored) : [];
+    this.displayRecentSearches();
+};
+
+WeatherApp.prototype.saveRecentSearch = function(city) {
+
+    city = city.charAt(0).toUpperCase() + city.slice(1).toLowerCase();
+
+    this.recentSearches = this.recentSearches.filter(c => c !== city);
+
+    this.recentSearches.unshift(city);
+
+    if (this.recentSearches.length > 5) {
+        this.recentSearches.pop();
+    }
+
+    localStorage.setItem("recentSearches", JSON.stringify(this.recentSearches));
+    localStorage.setItem("lastCity", city);
+
+    this.displayRecentSearches();
+};
+
+WeatherApp.prototype.displayRecentSearches = function() {
+    this.recentContainer.innerHTML = "";
+
+    this.recentSearches.forEach(city => {
+        const btn = document.createElement("button");
+        btn.textContent = city;
+        btn.addEventListener("click", () => {
+            this.getWeather(city);
+        });
+        this.recentContainer.appendChild(btn);
+    });
+};
+
+WeatherApp.prototype.loadLastCity = function() {
+    const lastCity = localStorage.getItem("lastCity");
+    if (lastCity) {
+        this.getWeather(lastCity);
+    }
+};
+
+WeatherApp.prototype.clearHistory = function() {
+    localStorage.removeItem("recentSearches");
+    localStorage.removeItem("lastCity");
+    this.recentSearches = [];
+    this.displayRecentSearches();
+};
+
+/* ================= UI ================= */
 
 WeatherApp.prototype.showLoading = function() {
     this.weatherDisplay.innerHTML = `<div class="spinner"></div>`;
@@ -118,12 +171,7 @@ WeatherApp.prototype.showError = function(message) {
     this.weatherDisplay.innerHTML = `<p class="error">${message}</p>`;
 };
 
-WeatherApp.prototype.showWelcome = function() {
-    this.weatherDisplay.innerHTML =
-        `<p>Search for a city to see weather & 5-day forecast 🌍</p>`;
-};
-
-/* ================= CREATE INSTANCE ================= */
+/* ================= START APP ================= */
 
 const app = new WeatherApp();
 app.init();
